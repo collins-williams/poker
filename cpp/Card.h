@@ -39,15 +39,17 @@ namespace Ranks
       "seven", "eight", "nine", "ten",
 		 "jack", "queen", "king", "ace"};
 
-
+  static unordered_map<char, Ranks::Rank> char_to_rank =
+  {
+  	  {'A', Ranks::ace}, {'K', Ranks::king}, {'Q', Ranks::queen},
+	  {'J', Ranks::jack}, {'T', Ranks::ten}, {'9', Ranks::nine},
+	  {'8', Ranks::eight}, {'7', Ranks::seven}, {'6', Ranks::six},
+	  {'5', Ranks::five}, {'4', Ranks::four}, {'3', Ranks::three}, {'2', Ranks::deuce}
+  };
 
   const int num_ranks = 13;
 }
 
-static unordered_map<char, Ranks::Rank> char_to_rank =
-{
-	  {'A', Ranks::ace}, {'K', Ranks::king}
-};
 //std::ostream& operator<<(std::ostream& os,  Ranks::Rank& rank);
 
 class Card {
