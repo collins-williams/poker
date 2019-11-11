@@ -58,8 +58,17 @@ public:
 	StringRule(std::string s);
 	bool match(Card a, Card b);
 
+	static const int UnknownRule = 1;
+	static const int PairRule = 2;
+	static const int SuitedComboRule = 3;
+	static const int UnsuitedComboRule = 4;
+	static const int PairRangeRule = 5;
+	static const int SuitedComboRangeRule = 6;
+	static const int UnsuitedComboRangeRule = 7;
+
 private:
 	std::string s;
+	int  type;
 };
 
 
