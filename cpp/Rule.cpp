@@ -190,7 +190,6 @@ bool UnsuitedComboRangeRule::match(Card a, Card b) {
     return false;
 }
 
-// TODO this checks the gap size but not check whether the cards fall with in range
 bool SuitedGapRangeRule::match(Card a, Card b) {
     if (a.suit() != b.suit()) {
         return false;
