@@ -47,6 +47,7 @@ class SingleRule: public Rule {
 public:
 	SingleRule(Card& a, Card& b);
 	bool match(Card a, Card b);
+	virtual ~SingleRule();
 
 private:
 	Card c1;
@@ -56,8 +57,11 @@ private:
 class StringRule: public Rule {
 public:
 	StringRule(std::string s);
-	bool match(Card a, Card b);
+	virtual bool match(Card a, Card b) = 0;
+	virtual ~StringRule();
 
+    std::string rule;
+#if 0
 	static const int UnknownRule = 1;
 	static const int PairRule = 2;
 	static const int SuitedComboRule = 3;
@@ -65,10 +69,61 @@ public:
 	static const int PairRangeRule = 5;
 	static const int SuitedComboRangeRule = 6;
 	static const int UnsuitedComboRangeRule = 7;
+#endif
 
 private:
-	std::string s;
-	int  type;
+
+	//int  type;
+};
+
+class StringRuleMaker {
+public:
+    StringRuleMaker();
+    ~StringRuleMaker();
+    StringRule* parse_rule(std::string s);
+
+};
+
+class PairRule: public StringRule {
+public:
+    PairRule(std::string s);
+    ~PairRule();
+    bool match(Card a, Card b);
+};
+
+class SuitedComboRule: public StringRule {
+public:
+    SuitedComboRule(std::string s);
+    ~SuitedComboRule();
+    bool match(Card a, Card b);
+};
+
+class UnsuitedComboRule: public StringRule {
+public:
+    UnsuitedComboRule(std::string s);
+    ~UnsuitedComboRule();
+    bool match(Card a, Card b);
+};
+
+class PairRangeRule: public StringRule {
+public:
+    PairRangeRule(std::string s);
+    ~PairRangeRule();
+    bool match(Card a, Card b);
+};
+
+class SuitedComboRangeRule: public StringRule {
+public:
+    SuitedComboRangeRule(std::string s);
+    ~SuitedComboRangeRule();
+    bool match(Card a, Card b);
+};
+
+class UnsuitedComboRangeRule: public StringRule {
+public:
+    UnsuitedComboRangeRule(std::string s);
+    ~UnsuitedComboRangeRule();
+    bool match(Card a, Card b);
 };
 
 
