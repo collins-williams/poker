@@ -84,7 +84,16 @@ UnsuitedComboRangeRule::UnsuitedComboRangeRule(std::string s) :  StringRule(s) {
 UnsuitedComboRangeRule::~UnsuitedComboRangeRule() {
 }
 
+
+SuitedGapRangeRule::SuitedGapRangeRule(std::string s) :  StringRule(s) {
+}
+SuitedGapRangeRule::~SuitedGapRangeRule() {
+
+}
+
 StringRule* StringRuleMaker::parse_rule(std::string st) {
+
+    //TODO look at throwing an exception rather than a nullptr?
 
     if (st.length() == 2 && st[0] == st[1]) {
         //TODO see that it is a correct card letter
@@ -109,6 +118,11 @@ StringRule* StringRuleMaker::parse_rule(std::string st) {
             && (st[2] == 'o') && (st[6] == 'o')
             && (Ranks::char_to_rank[st[1]]) > Ranks::char_to_rank[st[5]]) {
         return new UnsuitedComboRangeRule(st);
+    } else if ((st.length() == 7) &&
+            (Ranks::char_to_rank[st[0]] > Ranks::char_to_rank[st[4]]) &&
+            ((Ranks::char_to_rank[st[1]] - Ranks::char_to_rank[st[5]]) == (Ranks::char_to_rank[st[0]] - Ranks::char_to_rank[st[4]])) &&
+            (st[2] == 's') && (st[6] == 's') && (st[3] == '-')){
+        return new SuitedGapRangeRule(st);
     } else {
         return nullptr;
     }
@@ -175,3 +189,22 @@ bool UnsuitedComboRangeRule::match(Card a, Card b) {
     }
     return false;
 }
+
+// TODO this checks the gap size but not check whether the cards fall with in range
+bool SuitedGapRangeRule::match(Card a, Card b) {
+    if (a.suit() != b.suit()) {
+        return false;
+    }
+    if (a.rank() > b.rank()) {
+        return ((a.rank() <= Ranks::char_to_rank[rule[0]] && (a.rank() >= Ranks::char_to_rank[rule[4]])) &&
+                ((a.rank() - b.rank()) ==
+                (Ranks::char_to_rank[rule[0]] - Ranks::char_to_rank[rule[1]])));
+    } else if (b.rank() > a.rank()) {
+        return (((b.rank() <= Ranks::char_to_rank[rule[0]]) && (b.rank() >= Ranks::char_to_rank[rule[4]])) &&
+                (((b.rank() - a.rank()) ==
+                (Ranks::char_to_rank[rule[0]] - Ranks::char_to_rank[rule[1]]))));
+    } else {
+        return false;
+    }
+}
+

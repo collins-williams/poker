@@ -59,18 +59,8 @@ public:
 	StringRule(std::string s);
 	virtual bool match(Card a, Card b) = 0;
 	virtual ~StringRule();
-
+protected:
     std::string rule;
-#if 0
-	static const int UnknownRule = 1;
-	static const int PairRule = 2;
-	static const int SuitedComboRule = 3;
-	static const int UnsuitedComboRule = 4;
-	static const int PairRangeRule = 5;
-	static const int SuitedComboRangeRule = 6;
-	static const int UnsuitedComboRangeRule = 7;
-#endif
-
 private:
 
 	//int  type;
@@ -123,6 +113,13 @@ class UnsuitedComboRangeRule: public StringRule {
 public:
     UnsuitedComboRangeRule(std::string s);
     ~UnsuitedComboRangeRule();
+    bool match(Card a, Card b);
+};
+
+class SuitedGapRangeRule: public StringRule {
+public:
+    SuitedGapRangeRule(std::string s);
+    ~SuitedGapRangeRule();
     bool match(Card a, Card b);
 };
 
