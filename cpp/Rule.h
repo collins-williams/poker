@@ -123,6 +123,12 @@ public:
     bool match(Card a, Card b);
 };
 
+class UnsuitedGapRangeRule: public StringRule {
+public:
+    UnsuitedGapRangeRule(std::string s);
+    ~UnsuitedGapRangeRule();
+    bool match(Card a, Card b);
+};
 
 void rule_test();
 #endif /* RULE_H_ */

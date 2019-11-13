@@ -149,7 +149,7 @@ void rule_test() {
         }
     }
 
-    // TODO  XYs-WZs specifies all suited combinations in which a X-W == Y-Z
+    // XYs-WZs specifies all suited combinations in which a X-W == Y-Z
     //            that fall between X and W inclusive
     auto srAQsJ9s = sm.parse_rule("AQs-J9s");
     assert(srAQsJ9s != nullptr);
@@ -180,4 +180,35 @@ void rule_test() {
             }
         }
     }
+
+    //    XYo-WZo specifies all suited combinations in which a X-W == Y-Z
+    //            that fall between X and W inclusive
+    auto srKQo87o = sm.parse_rule("KQo-87o");
+     assert(srKQo87o != nullptr);
+     for (const auto r1 : Ranks::All) {
+         for (const auto s1 : Suits::All) {
+             auto c1 = Card(r1, s1);
+             for (const auto r2 : Ranks::All) {
+                 for (const auto s2 : Suits::All) {
+                     auto c2 = Card(r2, s2);
+                     if (c1 == c2) {
+                         //skip
+                     } else {
+                         res = (((r1 - r2 == 1) && (r1 >= Ranks::eight && r1 <= Ranks::king)) ||
+                               ((r1 - r2 == -1) && (r2 >= Ranks::eight  && r2 <= Ranks::king)));
+
+                         if (srKQo87o->match(c1, c2) != res) {
+                             cout << "rule failed " <<  "KQo-87o" << " expected " << res << " "<< c1 << c2 << "\n";
+                             assert(false);
+                         }
+
+                         if (srKQo87o->match(c2, c1) != res) {
+                             cout << "rule failed " <<  "KQo-87o" << " expected " << res << " " << c1 << c2 << "\n";
+                             assert(false);
+                         }
+                     }
+                 }
+             }
+         }
+     }
 }

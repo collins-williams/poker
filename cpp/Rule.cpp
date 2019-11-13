@@ -91,6 +91,15 @@ SuitedGapRangeRule::~SuitedGapRangeRule() {
 
 }
 
+UnsuitedGapRangeRule::UnsuitedGapRangeRule(std::string s) :  StringRule(s) {
+}
+UnsuitedGapRangeRule::~UnsuitedGapRangeRule() {
+
+}
+//TODO get rid of magic numbers (perhaps per subclass constants?)
+//TODO pre chew the rule where practical
+//TODO collapse suited and unsuited rules
+
 StringRule* StringRuleMaker::parse_rule(std::string st) {
 
     //TODO look at throwing an exception rather than a nullptr?
@@ -123,6 +132,11 @@ StringRule* StringRuleMaker::parse_rule(std::string st) {
             ((Ranks::char_to_rank[st[1]] - Ranks::char_to_rank[st[5]]) == (Ranks::char_to_rank[st[0]] - Ranks::char_to_rank[st[4]])) &&
             (st[2] == 's') && (st[6] == 's') && (st[3] == '-')){
         return new SuitedGapRangeRule(st);
+    } else if (((st.length() == 7) &&
+            (Ranks::char_to_rank[st[0]] > Ranks::char_to_rank[st[4]]) &&
+            ((Ranks::char_to_rank[st[1]] - Ranks::char_to_rank[st[5]]) == (Ranks::char_to_rank[st[0]] - Ranks::char_to_rank[st[4]])) &&
+            (st[2] == 'o') && (st[6] == 'o') && (st[3] == '-'))) {
+        return new UnsuitedGapRangeRule(st);
     } else {
         return nullptr;
     }
@@ -207,3 +221,16 @@ bool SuitedGapRangeRule::match(Card a, Card b) {
     }
 }
 
+bool UnsuitedGapRangeRule::match(Card a, Card b) {
+    if (a.rank() > b.rank()) {
+        return ((a.rank() <= Ranks::char_to_rank[rule[0]] && (a.rank() >= Ranks::char_to_rank[rule[4]])) &&
+                ((a.rank() - b.rank()) ==
+                (Ranks::char_to_rank[rule[0]] - Ranks::char_to_rank[rule[1]])));
+    } else if (b.rank() > a.rank()) {
+        return (((b.rank() <= Ranks::char_to_rank[rule[0]]) && (b.rank() >= Ranks::char_to_rank[rule[4]])) &&
+                (((b.rank() - a.rank()) ==
+                (Ranks::char_to_rank[rule[0]] - Ranks::char_to_rank[rule[1]]))));
+    } else {
+        return false;
+    }
+}
