@@ -52,50 +52,38 @@ StringRule::~StringRule() {
 
 }
 
-PairRule::PairRule(std::string s) : StringRule(s) {
+SuitAffectedRule::SuitAffectedRule(std::string s) : StringRule(s) {
+    suited = false;
+}
+SuitAffectedRule::~SuitAffectedRule() {
+}
+
+PairRule::PairRule(std::string s) :  StringRule(s) {
     }
 PairRule::~PairRule() {
     }
-
-SuitedComboRule::SuitedComboRule(std::string s) : StringRule(s) {
-    }
-SuitedComboRule::~SuitedComboRule()    {
-}
-
-
-UnsuitedComboRule::UnsuitedComboRule(std::string s) :  StringRule(s) {
-}
-UnsuitedComboRule::~UnsuitedComboRule() {
-}
 
 PairRangeRule::PairRangeRule(std::string s) :  StringRule(s) {
 }
 PairRangeRule::~PairRangeRule() {
 }
 
-
-SuitedComboRangeRule::SuitedComboRangeRule(std::string s) : StringRule(s) {
-}
-SuitedComboRangeRule::~SuitedComboRangeRule() {
-}
-
-UnsuitedComboRangeRule::UnsuitedComboRangeRule(std::string s) :  StringRule(s) {
-}
-UnsuitedComboRangeRule::~UnsuitedComboRangeRule() {
+ComboRule::ComboRule(std::string s) : SuitAffectedRule(s) {
+    }
+ComboRule::~ComboRule()    {
 }
 
-
-SuitedGapRangeRule::SuitedGapRangeRule(std::string s) :  StringRule(s) {
+ComboRangeRule::ComboRangeRule(std::string s) : SuitAffectedRule(s) {
 }
-SuitedGapRangeRule::~SuitedGapRangeRule() {
+ComboRangeRule::~ComboRangeRule() {
+}
+
+GapRangeRule::GapRangeRule(std::string s) :  SuitAffectedRule(s) {
+}
+GapRangeRule::~GapRangeRule() {
 
 }
 
-UnsuitedGapRangeRule::UnsuitedGapRangeRule(std::string s) :  StringRule(s) {
-}
-UnsuitedGapRangeRule::~UnsuitedGapRangeRule() {
-
-}
 //TODO get rid of magic numbers (perhaps per subclass constants?)
 //TODO pre chew the rule where practical
 //TODO collapse suited and unsuited rules
@@ -109,34 +97,24 @@ StringRule* StringRuleMaker::parse_rule(std::string st) {
         return new PairRule(st);
     } else if (st.length() == 3) {
         //XYs or XYo
-        if (st[2] == 's') {
-            return new SuitedComboRule(st);
-        } else if (st[2] == 'o') {
-            return new UnsuitedComboRule(st);
-        } else {
-            return nullptr;
-        }
+        auto sr = new ComboRule(st);
+        sr->suited = st[2] == 's';
+        return sr;
     } else if ((st.length() == 5) && (st[0] == st[1]) && (st[2] = '-')
             && (st[3] == st[4])) {
         return new PairRangeRule(st);
-    } else if ((st.length() == 7) && (st[0] == st[4]) && (st[3] == '-')
-               && (st[2] == 's') && (st[6] == 's')
-               && (Ranks::char_to_rank[st[1]]) > Ranks::char_to_rank[st[5]]) {
-        return new SuitedComboRangeRule(st);
-    } else if ((st.length() == 7) && (st[0] == st[4]) && (st[3] == '-')
-            && (st[2] == 'o') && (st[6] == 'o')
-            && (Ranks::char_to_rank[st[1]]) > Ranks::char_to_rank[st[5]]) {
-        return new UnsuitedComboRangeRule(st);
+    } else if ((st.length() == 7) && (st[0] == st[4]) && (st[3] == '-') &&
+            (Ranks::char_to_rank[st[1]]) > Ranks::char_to_rank[st[5]]) {
+        auto sr = new ComboRangeRule(st);
+        sr->suited = st[2] == 's' && st[6] == 's';
+        return sr;
     } else if ((st.length() == 7) &&
             (Ranks::char_to_rank[st[0]] > Ranks::char_to_rank[st[4]]) &&
             ((Ranks::char_to_rank[st[1]] - Ranks::char_to_rank[st[5]]) == (Ranks::char_to_rank[st[0]] - Ranks::char_to_rank[st[4]])) &&
-            (st[2] == 's') && (st[6] == 's') && (st[3] == '-')){
-        return new SuitedGapRangeRule(st);
-    } else if (((st.length() == 7) &&
-            (Ranks::char_to_rank[st[0]] > Ranks::char_to_rank[st[4]]) &&
-            ((Ranks::char_to_rank[st[1]] - Ranks::char_to_rank[st[5]]) == (Ranks::char_to_rank[st[0]] - Ranks::char_to_rank[st[4]])) &&
-            (st[2] == 'o') && (st[6] == 'o') && (st[3] == '-'))) {
-        return new UnsuitedGapRangeRule(st);
+            (st[3] == '-')) {
+        auto sr = new GapRangeRule(st);
+        sr->suited = st[2] == 's' && st[6] == 's';
+        return sr;
     } else {
         return nullptr;
     }
@@ -147,18 +125,10 @@ bool PairRule::match(Card a, Card b) {
     return ((Ranks::char_to_rank[rule[0]] == a.rank()) && (a.rank() == b.rank()));
 }
 
-bool SuitedComboRule::match(Card a, Card b) {
-    if (a.suit() != b.suit()) {
+bool ComboRule::match(Card a, Card b) {
+    if ((suited) && (a.suit() != b.suit())) {
         return false;
     }
-    return (((Ranks::char_to_rank[rule[0]] == a.rank())
-            && (Ranks::char_to_rank[rule[1]] == b.rank()))
-            || ((Ranks::char_to_rank[rule[0]] == b.rank())
-                    && (Ranks::char_to_rank[rule[1]] == a.rank())));
-}
-
-bool UnsuitedComboRule::match(Card a, Card b) {
-    //TODO look at making this a helper
     return (((Ranks::char_to_rank[rule[0]] == a.rank())
             && (Ranks::char_to_rank[rule[1]] == b.rank()))
             || ((Ranks::char_to_rank[rule[0]] == b.rank())
@@ -173,8 +143,8 @@ bool PairRangeRule::match(Card a, Card b) {
             && a.rank() >= Ranks::char_to_rank[rule[3]]);
 }
 
-bool SuitedComboRangeRule::match(Card a, Card b) {
-    if (a.suit() != b.suit()) {
+bool ComboRangeRule::match(Card a, Card b) {
+    if ((suited) && (a.suit() != b.suit())) {
         return false;
     }
     if ((a.rank() == Ranks::char_to_rank[rule[0]])
@@ -190,38 +160,10 @@ bool SuitedComboRangeRule::match(Card a, Card b) {
     return false;
 }
 
-bool UnsuitedComboRangeRule::match(Card a, Card b) {
-    if ((a.rank() == Ranks::char_to_rank[rule[0]])
-            && (b.rank() <= Ranks::char_to_rank[rule[1]])
-            && (b.rank() >= Ranks::char_to_rank[rule[5]])) {
-        return true;
-    }
-    if ((b.rank() == Ranks::char_to_rank[rule[0]])
-            && (a.rank() <= Ranks::char_to_rank[rule[1]])
-            && (a.rank() >= Ranks::char_to_rank[rule[5]])) {
-        return true;
-    }
-    return false;
-}
-
-bool SuitedGapRangeRule::match(Card a, Card b) {
-    if (a.suit() != b.suit()) {
+bool GapRangeRule::match(Card a, Card b) {
+    if ((suited) && (a.suit() != b.suit())) {
         return false;
     }
-    if (a.rank() > b.rank()) {
-        return ((a.rank() <= Ranks::char_to_rank[rule[0]] && (a.rank() >= Ranks::char_to_rank[rule[4]])) &&
-                ((a.rank() - b.rank()) ==
-                (Ranks::char_to_rank[rule[0]] - Ranks::char_to_rank[rule[1]])));
-    } else if (b.rank() > a.rank()) {
-        return (((b.rank() <= Ranks::char_to_rank[rule[0]]) && (b.rank() >= Ranks::char_to_rank[rule[4]])) &&
-                (((b.rank() - a.rank()) ==
-                (Ranks::char_to_rank[rule[0]] - Ranks::char_to_rank[rule[1]]))));
-    } else {
-        return false;
-    }
-}
-
-bool UnsuitedGapRangeRule::match(Card a, Card b) {
     if (a.rank() > b.rank()) {
         return ((a.rank() <= Ranks::char_to_rank[rule[0]] && (a.rank() >= Ranks::char_to_rank[rule[4]])) &&
                 ((a.rank() - b.rank()) ==

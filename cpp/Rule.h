@@ -81,20 +81,6 @@ public:
     bool match(Card a, Card b);
 };
 
-class SuitedComboRule: public StringRule {
-public:
-    SuitedComboRule(std::string s);
-    ~SuitedComboRule();
-    bool match(Card a, Card b);
-};
-
-class UnsuitedComboRule: public StringRule {
-public:
-    UnsuitedComboRule(std::string s);
-    ~UnsuitedComboRule();
-    bool match(Card a, Card b);
-};
-
 class PairRangeRule: public StringRule {
 public:
     PairRangeRule(std::string s);
@@ -102,31 +88,33 @@ public:
     bool match(Card a, Card b);
 };
 
-class SuitedComboRangeRule: public StringRule {
+class SuitAffectedRule: public StringRule {
 public:
-    SuitedComboRangeRule(std::string s);
-    ~SuitedComboRangeRule();
+    SuitAffectedRule(std::string s);
+    ~SuitAffectedRule();
+    bool match(Card a, Card b) = 0;
+
+    bool suited;
+};
+
+class ComboRule: public SuitAffectedRule {
+public:
+    ComboRule(std::string s);
+    ~ComboRule();
     bool match(Card a, Card b);
 };
 
-class UnsuitedComboRangeRule: public StringRule {
+class ComboRangeRule: public SuitAffectedRule {
 public:
-    UnsuitedComboRangeRule(std::string s);
-    ~UnsuitedComboRangeRule();
+    ComboRangeRule(std::string s);
+    ~ComboRangeRule();
     bool match(Card a, Card b);
 };
 
-class SuitedGapRangeRule: public StringRule {
+class GapRangeRule: public SuitAffectedRule {
 public:
-    SuitedGapRangeRule(std::string s);
-    ~SuitedGapRangeRule();
-    bool match(Card a, Card b);
-};
-
-class UnsuitedGapRangeRule: public StringRule {
-public:
-    UnsuitedGapRangeRule(std::string s);
-    ~UnsuitedGapRangeRule();
+    GapRangeRule(std::string s);
+    ~GapRangeRule();
     bool match(Card a, Card b);
 };
 
