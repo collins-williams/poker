@@ -164,7 +164,7 @@ void rule_test() {
                     } else {
                         res = (s1 == s2) &&
                               (((r1 - r2 == 2) && (r1 >= Ranks::jack && r1 <= Ranks::ace)) ||
-                              ((r1 - r2 == -2) && (r2 >= Ranks::jack  && r2 <= Ranks::ace)));
+                              ((r1 - r2 == -2) && (r2 >= Ranks::jack && r2 <= Ranks::ace)));
 
                         if (srAQsJ9s->match(c1, c2) != res) {
                             cout << "rule failed " <<  "AQs-J9s" << " expected " << res << " "<< c1 << c2 << "\n";

@@ -62,8 +62,6 @@ public:
 protected:
     std::string rule;
 private:
-
-	//int  type;
 };
 
 class StringRuleMaker {
@@ -76,21 +74,25 @@ public:
 
 class PairRule: public StringRule {
 public:
-    PairRule(std::string s);
+    PairRule(std::string s, Ranks::Rank r);
     ~PairRule();
     bool match(Card a, Card b);
+
+    Ranks::Rank rank;
 };
 
 class PairRangeRule: public StringRule {
 public:
-    PairRangeRule(std::string s);
+    PairRangeRule(std::string s, Ranks::Rank range_top, Ranks::Rank range_bottom);
     ~PairRangeRule();
     bool match(Card a, Card b);
+
+    Ranks::Rank top, bottom;
 };
 
 class SuitAffectedRule: public StringRule {
 public:
-    SuitAffectedRule(std::string s);
+    SuitAffectedRule(std::string s, bool suits_match);
     ~SuitAffectedRule();
     bool match(Card a, Card b) = 0;
 
@@ -99,23 +101,33 @@ public:
 
 class ComboRule: public SuitAffectedRule {
 public:
-    ComboRule(std::string s);
+    ComboRule(std::string s, bool suits_match, Ranks::Rank first, Ranks::Rank second);
     ~ComboRule();
     bool match(Card a, Card b);
+
+    Ranks::Rank first_rank, second_rank;
 };
 
 class ComboRangeRule: public SuitAffectedRule {
 public:
-    ComboRangeRule(std::string s);
+    ComboRangeRule(std::string s, bool suits_match, Ranks::Rank top,
+            Ranks::Rank upper, Ranks::Rank lower);
     ~ComboRangeRule();
     bool match(Card a, Card b);
+
+    Ranks::Rank top_rank, upper_second, lower_second;
 };
 
+//    XYo-WZo specifies all suited combinations in which a X-W == Y-Z
+//            that fall between X and W inclusive
 class GapRangeRule: public SuitAffectedRule {
 public:
-    GapRangeRule(std::string s);
+    GapRangeRule(std::string s, bool suits_match, Ranks::Rank X, Ranks::Rank y,
+            Ranks::Rank w, Ranks::Rank z);
     ~GapRangeRule();
     bool match(Card a, Card b);
+
+    Ranks::Rank x,y,w,z;
 };
 
 void rule_test();

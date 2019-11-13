@@ -52,41 +52,55 @@ StringRule::~StringRule() {
 
 }
 
-SuitAffectedRule::SuitAffectedRule(std::string s) : StringRule(s) {
-    suited = false;
+SuitAffectedRule::SuitAffectedRule(std::string s, bool suits_match) : StringRule(s) {
+    suited = suits_match;
 }
 SuitAffectedRule::~SuitAffectedRule() {
 }
 
-PairRule::PairRule(std::string s) :  StringRule(s) {
+PairRule::PairRule(std::string s, Ranks::Rank r) :  StringRule(s) {
+    rank = r;
     }
 PairRule::~PairRule() {
     }
 
-PairRangeRule::PairRangeRule(std::string s) :  StringRule(s) {
+PairRangeRule::PairRangeRule(std::string s, Ranks::Rank range_top, Ranks::Rank range_bottom)
+    :  StringRule(s) {
+    top = range_top;
+    bottom = range_bottom;
 }
+
 PairRangeRule::~PairRangeRule() {
 }
 
-ComboRule::ComboRule(std::string s) : SuitAffectedRule(s) {
-    }
+ComboRule::ComboRule(std::string s, bool suits_match, Ranks::Rank first, Ranks::Rank second) : SuitAffectedRule(s, suits_match) {
+    first_rank = first;
+    second_rank = second;
+}
 ComboRule::~ComboRule()    {
 }
 
-ComboRangeRule::ComboRangeRule(std::string s) : SuitAffectedRule(s) {
+ComboRangeRule::ComboRangeRule(std::string s, bool suits_match, Ranks::Rank top,
+        Ranks::Rank upper, Ranks::Rank lower) : SuitAffectedRule(s, suits_match) {
+    top_rank = top;
+    upper_second = upper;
+    lower_second = lower;
 }
 ComboRangeRule::~ComboRangeRule() {
 }
 
-GapRangeRule::GapRangeRule(std::string s) :  SuitAffectedRule(s) {
+GapRangeRule::GapRangeRule(std::string s, bool suits_match, Ranks::Rank X, Ranks::Rank Y,
+            Ranks::Rank W, Ranks::Rank Z):  SuitAffectedRule(s, suits_match) {
+    x = X;
+    y = Y;
+    w = W;
+    z = Z;
 }
 GapRangeRule::~GapRangeRule() {
 
 }
 
 //TODO get rid of magic numbers (perhaps per subclass constants?)
-//TODO pre chew the rule where practical
-//TODO collapse suited and unsuited rules
 
 StringRule* StringRuleMaker::parse_rule(std::string st) {
 
@@ -94,27 +108,26 @@ StringRule* StringRuleMaker::parse_rule(std::string st) {
 
     if (st.length() == 2 && st[0] == st[1]) {
         //TODO see that it is a correct card letter
-        return new PairRule(st);
+        return new PairRule(st, Ranks::char_to_rank[st[0]]);
     } else if (st.length() == 3) {
         //XYs or XYo
-        auto sr = new ComboRule(st);
-        sr->suited = st[2] == 's';
-        return sr;
+        return new ComboRule(st, st[2] == 's', Ranks::char_to_rank[st[0]],
+                Ranks::char_to_rank[st[1]]);
     } else if ((st.length() == 5) && (st[0] == st[1]) && (st[2] = '-')
             && (st[3] == st[4])) {
-        return new PairRangeRule(st);
+        return new PairRangeRule(st, Ranks::char_to_rank[st[0]], Ranks::char_to_rank[st[3]]);
     } else if ((st.length() == 7) && (st[0] == st[4]) && (st[3] == '-') &&
             (Ranks::char_to_rank[st[1]]) > Ranks::char_to_rank[st[5]]) {
-        auto sr = new ComboRangeRule(st);
-        sr->suited = st[2] == 's' && st[6] == 's';
-        return sr;
+        return new ComboRangeRule(st, st[2] == 's' && st[6] == 's',
+                Ranks::char_to_rank[st[0]], Ranks::char_to_rank[st[1]],
+                Ranks::char_to_rank[st[5]]);
     } else if ((st.length() == 7) &&
             (Ranks::char_to_rank[st[0]] > Ranks::char_to_rank[st[4]]) &&
             ((Ranks::char_to_rank[st[1]] - Ranks::char_to_rank[st[5]]) == (Ranks::char_to_rank[st[0]] - Ranks::char_to_rank[st[4]])) &&
             (st[3] == '-')) {
-        auto sr = new GapRangeRule(st);
-        sr->suited = st[2] == 's' && st[6] == 's';
-        return sr;
+        return new GapRangeRule(st, st[2] == 's' && st[6] == 's',
+                Ranks::char_to_rank[st[0]], Ranks::char_to_rank[st[1]],
+                Ranks::char_to_rank[st[4]], Ranks::char_to_rank[st[5]]);
     } else {
         return nullptr;
     }
@@ -122,39 +135,36 @@ StringRule* StringRuleMaker::parse_rule(std::string st) {
 }
 
 bool PairRule::match(Card a, Card b) {
-    return ((Ranks::char_to_rank[rule[0]] == a.rank()) && (a.rank() == b.rank()));
+    return ((rank == a.rank()) && (a.rank() == b.rank()));
 }
 
 bool ComboRule::match(Card a, Card b) {
     if ((suited) && (a.suit() != b.suit())) {
         return false;
     }
-    return (((Ranks::char_to_rank[rule[0]] == a.rank())
-            && (Ranks::char_to_rank[rule[1]] == b.rank()))
-            || ((Ranks::char_to_rank[rule[0]] == b.rank())
-                    && (Ranks::char_to_rank[rule[1]] == a.rank())));
+    return (((first_rank == a.rank()) && (second_rank == b.rank())) ||
+            ((first_rank == b.rank()) && (second_rank == a.rank())));
 }
 
 bool PairRangeRule::match(Card a, Card b) {
     if (a.rank() != b.rank()) {
         return false;
     }
-    return (a.rank() <= Ranks::char_to_rank[rule[0]]
-            && a.rank() >= Ranks::char_to_rank[rule[3]]);
+    return ((a.rank() <= top) && (a.rank() >= bottom));
 }
 
 bool ComboRangeRule::match(Card a, Card b) {
     if ((suited) && (a.suit() != b.suit())) {
         return false;
     }
-    if ((a.rank() == Ranks::char_to_rank[rule[0]])
-            && (b.rank() <= Ranks::char_to_rank[rule[1]])
-            && (b.rank() >= Ranks::char_to_rank[rule[5]])) {
+    if ((a.rank() == top_rank)
+            && (b.rank() <= upper_second)
+            && (b.rank() >= lower_second)) {
         return true;
     }
-    if ((b.rank() == Ranks::char_to_rank[rule[0]])
-            && (a.rank() <= Ranks::char_to_rank[rule[1]])
-            && (a.rank() >= Ranks::char_to_rank[rule[5]])) {
+    if ((b.rank() == top_rank)
+            && (a.rank() <= upper_second)
+            && (a.rank() >= lower_second)) {
         return true;
     }
     return false;
@@ -165,13 +175,11 @@ bool GapRangeRule::match(Card a, Card b) {
         return false;
     }
     if (a.rank() > b.rank()) {
-        return ((a.rank() <= Ranks::char_to_rank[rule[0]] && (a.rank() >= Ranks::char_to_rank[rule[4]])) &&
-                ((a.rank() - b.rank()) ==
-                (Ranks::char_to_rank[rule[0]] - Ranks::char_to_rank[rule[1]])));
+        return ((a.rank() <= x && (a.rank() >= w)) &&
+                ((a.rank() - b.rank()) == (x - y)));
     } else if (b.rank() > a.rank()) {
-        return (((b.rank() <= Ranks::char_to_rank[rule[0]]) && (b.rank() >= Ranks::char_to_rank[rule[4]])) &&
-                (((b.rank() - a.rank()) ==
-                (Ranks::char_to_rank[rule[0]] - Ranks::char_to_rank[rule[1]]))));
+        return (((b.rank() <= x) && (b.rank() >= w)) &&
+                (((b.rank() - a.rank()) == (x - y))));
     } else {
         return false;
     }
