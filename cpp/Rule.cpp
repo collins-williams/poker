@@ -16,10 +16,6 @@ Rule::~Rule() {
     // TODO Auto-generated destructor stub
 }
 
-bool Rule::match(Card a, Card b) {
-    return false;
-}
-
 SingleRule::SingleRule(Card& a, Card& b) :
         c1 { a }, c2 { b } {
     assert(!(c1 == c2));
@@ -37,35 +33,28 @@ bool SingleRule::match(Card a, Card b) {
     return false;
 }
 
-StringRuleMaker::StringRuleMaker() {
+RuleMaker::RuleMaker() {
 
 }
 
-StringRuleMaker::~StringRuleMaker() {
+RuleMaker::~RuleMaker() {
 
 }
 
-StringRule::StringRule(std::string st) : rule { st } {
-}
-
-StringRule::~StringRule() {
-
-}
-
-SuitAffectedRule::SuitAffectedRule(std::string s, bool suits_match) : StringRule(s) {
+SuitAffectedRule::SuitAffectedRule(std::string s, bool suits_match) : Rule() {
     suited = suits_match;
 }
 SuitAffectedRule::~SuitAffectedRule() {
 }
 
-PairRule::PairRule(std::string s, Ranks::Rank r) :  StringRule(s) {
+PairRule::PairRule(std::string s, Ranks::Rank r) :  Rule() {
     rank = r;
     }
 PairRule::~PairRule() {
     }
 
 PairRangeRule::PairRangeRule(std::string s, Ranks::Rank range_top, Ranks::Rank range_bottom)
-    :  StringRule(s) {
+    :  Rule() {
     top = range_top;
     bottom = range_bottom;
 }
@@ -102,7 +91,7 @@ GapRangeRule::~GapRangeRule() {
 
 //TODO get rid of magic numbers (perhaps per subclass constants?)
 
-StringRule* StringRuleMaker::parse_rule(std::string st) {
+Rule* RuleMaker::parse_rule(std::string st) {
 
     //TODO look at throwing an exception rather than a nullptr?
 

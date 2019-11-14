@@ -35,7 +35,7 @@ public:
 	~Rule();
 
 	// return true if rule matches card pair
-	virtual bool match(Card a, Card b);
+	virtual bool match(Card a, Card b) =0;
 
 	//TODO to_string();
 
@@ -54,25 +54,15 @@ private:
 	Card c2;
 };
 
-class StringRule: public Rule {
+class RuleMaker {
 public:
-	StringRule(std::string s);
-	virtual bool match(Card a, Card b) = 0;
-	virtual ~StringRule();
-protected:
-    std::string rule;
-private:
-};
-
-class StringRuleMaker {
-public:
-    StringRuleMaker();
-    ~StringRuleMaker();
-    StringRule* parse_rule(std::string s);
+    RuleMaker();
+    ~RuleMaker();
+    Rule* parse_rule(std::string s);
 
 };
 
-class PairRule: public StringRule {
+class PairRule: public Rule {
 public:
     PairRule(std::string s, Ranks::Rank r);
     ~PairRule();
@@ -81,7 +71,7 @@ public:
     Ranks::Rank rank;
 };
 
-class PairRangeRule: public StringRule {
+class PairRangeRule: public Rule {
 public:
     PairRangeRule(std::string s, Ranks::Rank range_top, Ranks::Rank range_bottom);
     ~PairRangeRule();
@@ -90,7 +80,7 @@ public:
     Ranks::Rank top, bottom;
 };
 
-class SuitAffectedRule: public StringRule {
+class SuitAffectedRule: public Rule {
 public:
     SuitAffectedRule(std::string s, bool suits_match);
     ~SuitAffectedRule();

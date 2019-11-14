@@ -30,7 +30,7 @@ void rule_test() {
     assert(!r.match(qd, kc));
 
 
-    auto sm = StringRuleMaker();
+    auto sm = RuleMaker();
     //auto r1 = SingleRule(qd, qd);  need to keep this commented out
 
     //  XX     a pair of X
