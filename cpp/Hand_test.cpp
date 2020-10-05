@@ -152,6 +152,8 @@ void hand_test() {
 	assert(h4ak.evaluate() == "four of a kind");
 	assert(h4ak.score() == h4a3k.score());
 
+	//TODO add some negative test cases 2pair and 3 of a kind...
+	
 	/***********************************************************************/
 	// full house test cases
 
@@ -284,6 +286,8 @@ void hand_test() {
 	assert(h_f_akjt9.score() < h_f_akqt9.score());
 	assert(h_f_akqt9.score() < h_f_akqj9.score());
 	assert(h_f_akqj8.score() < h_f_akqj9.score());
+	
+	//TODO add negative test cases 4 of each of two suit?
 
 	/***********************************************************************/
 	// Straight test cases
@@ -408,6 +412,8 @@ void hand_test() {
 	h32.add_card(Card(Ranks::jack,  Suits::hearts));
 	assert(h32.evaluate() == "three of a kind");
 	assert(h32.score() < Hand::STRAIGHT_BASE_SCORE);
+	
+	// TODO negative test cases... check two pair
 
 	/***********************************************************************/
 	// test cases for two pair
