@@ -25,3 +25,9 @@ next steps
 //   there must be a way to describe a deal with text file or files that
 //   describe the players their positions and strategies
 //  (may be the players are in distinct files)
+
+************************************************
+Make calculators for ranking hands in various situations
+   how many other pair of possible hole cards beat us/tie with us/lose to us?
+   show each set
+   
