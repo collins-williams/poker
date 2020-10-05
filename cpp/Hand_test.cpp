@@ -38,9 +38,56 @@ void hand_test() {
 	hsw.add_card(Card(Ranks::deuce, Suits::spades));
 	hsw.add_card(Card(Ranks::five, Suits::spades));
 	hsw.add_card(Card(Ranks::ace, Suits::spades));
-	assert(h.score() >= Hand::STRAIGHT_FLUSH_BASE_SCORE);
-	assert(h.evaluate() == "straight flush");
+	assert(hsw.score() >= Hand::STRAIGHT_FLUSH_BASE_SCORE);
+	assert(hsw.evaluate() == "straight flush");
 	assert(h.score() > hsw.score());
+
+	// test the 2-6 is better than 1-5
+    auto h6h = Hand();
+    h6h.add_card(Card(Ranks::four, Suits::spades));
+    h6h.add_card(Card(Ranks::three, Suits::spades));
+    h6h.add_card(Card(Ranks::deuce, Suits::spades));
+    h6h.add_card(Card(Ranks::five, Suits::spades));
+    h6h.add_card(Card(Ranks::six, Suits::spades));
+    assert(h6h.score() >= Hand::STRAIGHT_FLUSH_BASE_SCORE);
+    cout << "6 high sf score " << h6h.score() << " steel wheel score " << hsw.score() << "\n";
+    assert(h6h.score() > hsw.score());
+
+	// test that K high is better than Q high
+	auto hkh = Hand();
+	hkh.add_card(Card(Ranks::king, Suits::spades));
+	hkh.add_card(Card(Ranks::queen, Suits::spades));
+	hkh.add_card(Card(Ranks::jack, Suits::spades));
+	hkh.add_card(Card(Ranks::ten, Suits::spades));
+	hkh.add_card(Card(Ranks::nine, Suits::spades));
+	hkh.add_card(Card(Ranks::eight, Suits::spades));
+
+	auto hqh = Hand();
+    hqh.add_card(Card(Ranks::queen, Suits::spades));
+    hqh.add_card(Card(Ranks::jack, Suits::spades));
+    hqh.add_card(Card(Ranks::ten, Suits::spades));
+    hqh.add_card(Card(Ranks::nine, Suits::spades));
+    hqh.add_card(Card(Ranks::eight, Suits::spades));
+
+    assert(hkh.score() > hqh.score());
+    cout << "k high sf score " << hkh.score() << " q high sf score " << hqh.score() << " steel wheel score " << hsw.score() << "\n";
+
+    // negative  see that 4 cards does not report a sf
+    auto hneg = Hand();
+    hneg.add_card(Card(Ranks::queen, Suits::hearts));
+    hneg.add_card(Card(Ranks::jack, Suits::spades));
+    hneg.add_card(Card(Ranks::ten, Suits::spades));
+    hneg.add_card(Card(Ranks::nine, Suits::spades));
+    hneg.add_card(Card(Ranks::eight, Suits::spades));
+    assert(hneg.score() < Hand::STRAIGHT_FLUSH_BASE_SCORE);
+
+    auto hnegsw = Hand();
+    hnegsw.add_card(Card(Ranks::four, Suits::spades));
+    hnegsw.add_card(Card(Ranks::three, Suits::spades));
+    hnegsw.add_card(Card(Ranks::deuce, Suits::spades));
+    hnegsw.add_card(Card(Ranks::five, Suits::spades));
+    hnegsw.add_card(Card(Ranks::ace, Suits::hearts));
+    assert(hnegsw.score() < Hand::STRAIGHT_FLUSH_BASE_SCORE);
 
 	/***********************************************************************/
 	// four of a kind test cases
@@ -274,6 +321,26 @@ void hand_test() {
 	h33.add_card(Card(Ranks::three,  Suits::hearts));
 	assert(h33.evaluate() == "straight");
     assert(h33.score() < Hand::FLUSH_BASE_SCORE);
+
+    // do wheel and negative test cases
+    auto hw = Hand();
+    hw.add_card(Card(Ranks::five, Suits::spades));
+    hw.add_card(Card(Ranks::four,  Suits::spades));
+    hw.add_card(Card(Ranks::three, Suits::spades));
+    hw.add_card(Card(Ranks::ace, Suits::spades));
+    hw.add_card(Card(Ranks::deuce, Suits::clubs));
+    assert(hw.score() >= Hand::STRAIGHT_BASE_SCORE);
+
+    auto h6hs = Hand();
+    h6hs.add_card(Card(Ranks::five, Suits::spades));
+    h6hs.add_card(Card(Ranks::four,  Suits::spades));
+    h6hs.add_card(Card(Ranks::three, Suits::spades));
+    h6hs.add_card(Card(Ranks::six, Suits::spades));
+    h6hs.add_card(Card(Ranks::deuce, Suits::clubs));
+    cout << "6 high straight score " << h6hs.score() << " wheel score " << hw.score() << "\n";
+    assert(h6hs.score() >= Hand::STRAIGHT_BASE_SCORE);
+    assert(h6hs.score() > hw.score());
+
 
 	/***********************************************************************/
 	// three of a kind test cases

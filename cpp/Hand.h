@@ -37,16 +37,16 @@ private:
 	std::vector<Card> cards;
 	std::string evaluation;
 	long int _score;
-	int evaluated_size;
-	int rank_histogram[Ranks::num_ranks];
-	int suit_histogram[Suits::num_suits];
+	unsigned int evaluated_size;
+	unsigned int rank_histogram[Ranks::num_ranks];
+	unsigned int suit_histogram[Suits::num_suits];
 	//std::string evaluate();
 	std::string evaluation_string();
 	std::string to_string();
 
-	const int MIN_SIZE = 5;
-	const int STRAIGHT_LENGTH = 5;
-	const int FLUSH_SIZE = 5;
+	const unsigned int MIN_SIZE = 5;
+	const unsigned int STRAIGHT_LENGTH = 5;
+	const unsigned int FLUSH_SIZE = 5;
 
 
 

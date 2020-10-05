@@ -142,30 +142,37 @@ void Hand::update_score(long int new_score) {
 
 bool Hand::straight_flush() {
     bool ret = false;
-    for(int low_card = 0; low_card <= (cards.size() - Hand::STRAIGHT_LENGTH); low_card++ ) {
-    	auto ok = true;
-    	int step = 1;
-    	Card& start_card = cards.at(low_card);
-    	while (ok && step < Hand::STRAIGHT_LENGTH) {
-    		if ((holds(Ranks::All[start_card.rank() + step], start_card.suit())) ||
-    			((start_card.rank() == Ranks::Rank::deuce) &&
-    					(step == Hand::STRAIGHT_LENGTH -1) &&
-						(holds(Ranks::Rank::ace, start_card.suit())))
-				) {
-    			step += 1;
-    		} else {
-    			ok = false;
-    		}
-    	}
-    	if (ok) {
-    		long int new_score = Hand::STRAIGHT_FLUSH_BASE_SCORE + start_card.rank() +
-    				(Hand::STRAIGHT_LENGTH - 1);
-    		update_score(new_score);
-    		ret = true;
-    	} else {
-    	}
-    }
 
+    for (unsigned int low_card = 0;
+            low_card <= (cards.size() - Hand::STRAIGHT_LENGTH); low_card++) {
+        auto steel_wheel = false;
+        auto ok = true;
+        unsigned int step = 1;
+        Card &start_card = cards.at(low_card);
+        while (ok && step < Hand::STRAIGHT_LENGTH) {
+            if (holds(Ranks::All[start_card.rank() + step],
+                    start_card.suit())) {
+                step += 1;
+            } else if ((start_card.rank() == Ranks::Rank::deuce)
+                    && (step == Hand::STRAIGHT_LENGTH - 1)
+                    && (holds(Ranks::Rank::ace, start_card.suit()))) {
+                steel_wheel = true;
+                step += 1;
+            } else {
+                ok = false;
+            }
+        }
+        if (ok) {
+            long int new_score = Hand::STRAIGHT_FLUSH_BASE_SCORE
+                    + start_card.rank() + (Hand::STRAIGHT_LENGTH - 1);
+            if (steel_wheel) {
+                new_score--;
+            }
+            update_score(new_score);
+            ret = true;
+        } else {
+        }
+    }
     return ret;
 }
 
@@ -223,7 +230,7 @@ bool Hand::flush() {
 		if (suit_histogram[s] >= Hand::FLUSH_SIZE) {
             _score = Hand::FLUSH_BASE_SCORE;
             // now add something for FLUSH_SIZE highest ranked cards
-            auto counted = 0;
+            unsigned int counted = 0;
             auto r = Ranks::num_ranks -1;
             while (counted < Hand::FLUSH_SIZE && r >= 0) {
             	if (holds(Ranks::All[r], Suits::All[s])) {
@@ -240,30 +247,29 @@ bool Hand::flush() {
 }
 
 bool Hand::straight() {
-	  for (auto r = Ranks::num_ranks -1; r >= Hand::STRAIGHT_LENGTH; r--) {
-		  auto ok = true;
-		  auto rank2 = r;
-		  while ((ok) && (rank2 > r - Hand::STRAIGHT_LENGTH)) {
-			  if (rank_histogram[rank2] == 0) {
-				  ok = false;
-			  }
-			  rank2--;
-		  }
-		  if (ok) {
-			  _score = Hand::STRAIGHT_BASE_SCORE + r;
-			  return true;
-		  }
-	  }
-      // check for wheel
-	  if ((rank_histogram[Ranks::ace] != 0) &&
-			  (rank_histogram[Ranks::deuce] != 0) &&
-			  (rank_histogram[Ranks::three] != 0) &&
-			  (rank_histogram[Ranks::four]  != 0) &&
-			  (rank_histogram[Ranks::five]  != 0)) {
-	        _score = Hand::STRAIGHT_BASE_SCORE + Ranks::five;
-	        return true;
-	  }
-	return false;
+    for (unsigned int r = Ranks::ace; r >= Ranks::six; r--) {
+        auto ok = true;
+        unsigned int rank2 = r - (Hand::STRAIGHT_LENGTH - 1);
+        while ((ok) && (rank2 <= r)) {
+            if (rank_histogram[rank2] == 0) {
+                ok = false;
+            }
+            rank2++;
+        }
+        if (ok) {
+            _score = Hand::STRAIGHT_BASE_SCORE + r;
+            return true;
+        }
+    }
+    // check for wheel
+    if ((rank_histogram[Ranks::ace] != 0) && (rank_histogram[Ranks::deuce] != 0)
+            && (rank_histogram[Ranks::three] != 0)
+            && (rank_histogram[Ranks::four] != 0)
+            && (rank_histogram[Ranks::five] != 0)) {
+        _score = Hand::STRAIGHT_BASE_SCORE + Ranks::five;
+        return true;
+    }
+    return false;
 }
 
 bool Hand::three_of_a_kind() {
