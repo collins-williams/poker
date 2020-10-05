@@ -341,6 +341,22 @@ void hand_test() {
     assert(h6hs.score() >= Hand::STRAIGHT_BASE_SCORE);
     assert(h6hs.score() > hw.score());
 
+    auto hwn = Hand();
+    hwn.add_card(Card(Ranks::five, Suits::spades));
+    hwn.add_card(Card(Ranks::four,  Suits::spades));
+    hwn.add_card(Card(Ranks::three, Suits::spades));
+    hwn.add_card(Card(Ranks::seven, Suits::spades));
+    hwn.add_card(Card(Ranks::deuce, Suits::clubs));
+    assert(hwn.score() < Hand::STRAIGHT_BASE_SCORE);
+
+    auto hsn = Hand();  // high straight negative
+    hsn.add_card(Card(Ranks::jack, Suits::spades));
+    hsn.add_card(Card(Ranks::king,  Suits::spades));
+    hsn.add_card(Card(Ranks::queen, Suits::spades));
+    hsn.add_card(Card(Ranks::ace, Suits::spades));
+    hsn.add_card(Card(Ranks::nine, Suits::clubs));
+    hsn.add_card(Card(Ranks::three,  Suits::hearts));
+    assert(hsn.score() < Hand::STRAIGHT_BASE_SCORE);
 
 	/***********************************************************************/
 	// three of a kind test cases
