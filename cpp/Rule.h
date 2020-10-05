@@ -25,7 +25,7 @@
 //            with a higher card of X and a lower card between Y and Z inclusive
 //    XYs-WZs specifies all suited combinations in which a X-W == Y-Z
 //            that fall between X and W inclusive
-//    XYo-WZo specifies all suited combinations in which a X-W == Y-Z
+//    XYo-WZo specifies all unsuited combinations in which a X-W == Y-Z
 //            that fall between X and W inclusive
 
 class Rule {
