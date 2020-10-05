@@ -5,6 +5,7 @@
  *      Author: root
  */
 
+#if 0
 #include "Player.h"
 
 Player::Player() {
@@ -16,3 +17,4 @@ Player::~Player() {
 	// TODO Auto-generated destructor stub
 }
 
+#endif

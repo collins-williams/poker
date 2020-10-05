@@ -5,7 +5,7 @@
  *      Author: root
  */
 
-
+#if 0
 
 #ifndef PLAYER_H_
 #define PLAYER_H_
@@ -28,4 +28,5 @@ private:
 
 };
 
+#endif
 #endif /* PLAYER_H_ */
